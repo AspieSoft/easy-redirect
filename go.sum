@@ -8,6 +8,8 @@ github.com/AspieSoft/gomail v1.2.0 h1:E6pz1F2IHRY/0jIyl323nJkqVcfISgWzouuDMU/G4v
 github.com/AspieSoft/gomail v1.2.0/go.mod h1:1xd9dwI5U4LlpWO4M2CKPePhKFlJQkYaq6WJ54GNhRI=
 github.com/AspieSoft/goutil/v5 v5.3.1 h1:XpMI7ZcUE3BU9LDvhLB20t3HMb4JdX6PAJn/iYEYguI=
 github.com/AspieSoft/goutil/v5 v5.3.1/go.mod h1:vQVVCsJtohmR1nqNBKysF+b/bVE6eFI6TskMFSChRn8=
+github.com/AspieSoft/goutil/v5 v5.3.3 h1:F3gy4oS0MEfqVVb+pSrDhp3YeILkS35FKdUT+kxFtd4=
+github.com/AspieSoft/goutil/v5 v5.3.3/go.mod h1:vQVVCsJtohmR1nqNBKysF+b/bVE6eFI6TskMFSChRn8=
 github.com/alphadose/haxmap v1.3.0 h1:C/2LboOnPCZP27GmmSXOcwx360st0P8N0fTJ3voefKc=
 github.com/alphadose/haxmap v1.3.0/go.mod h1:rjHw1IAqbxm0S3U5tD16GoKsiAd8FWx5BJ2IYqXwgmM=
 github.com/andybalholm/brotli v1.0.5 h1:8uQZIdzKmjc/iuPu7O2ioW48L81FgatrcpfFmiq/cCs=

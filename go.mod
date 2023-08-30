@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/AspieSoft/go-regex-re2 v1.0.0
 	github.com/AspieSoft/gomail v1.2.0
-	github.com/AspieSoft/goutil/v5 v5.3.1
+	github.com/AspieSoft/goutil/v5 v5.3.3
 	github.com/alphadose/haxmap v1.3.0
 )
 
