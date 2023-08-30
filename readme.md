@@ -17,7 +17,8 @@ git clone https://github.com/AspieSoft/easy-redirect
 ```json
 {
   "domain": "redirects.example.com",
-  "verifyPrefix": "example_com_api_verify"
+  "verifyPrefix": "example_com_api_verify",
+  "emailMatch": ".*@.*"
 }
 ```
 

@@ -425,6 +425,11 @@ func handleLogin(w http.ResponseWriter, r *http.Request) string {
 		return ""
 	}
 
+	if !regex.Comp(emailMatch).Match([]byte(email)) {
+		resErr(w, r, 403, "Permission Denied")
+		return ""
+	}
+
 	pcID := getPCID(r)
 	hashedIP := getHashedIP(r)
 

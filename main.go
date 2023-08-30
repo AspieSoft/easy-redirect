@@ -21,6 +21,7 @@ import (
 
 var serverDomain string
 var domainVerifyPrefix string
+var emailMatch string = `.*@.*`
 
 var validExtList []string = []string{
 	"css",
@@ -65,6 +66,9 @@ func main(){
 	}
 	serverDomain = goutil.Conv.ToString(config["domain"])
 	domainVerifyPrefix = goutil.Conv.ToString(config["verifyPrefix"])
+	if val, ok := config["emailMatch"]; ok {
+		emailMatch = goutil.Conv.ToString(val)
+	}
 
 	if stat, err := os.Stat(`./static-site`); err == nil && !stat.IsDir() {
 		cmd := exec.Command(`./static-site`)
