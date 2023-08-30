@@ -33,3 +33,5 @@ Note: Currently only compatable with gmail.
 }
 
 ```
+
+It is also recommended to modify `src/html/config.yml` to use your domain.
