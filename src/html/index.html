@@ -1,0 +1,27 @@
+<h2>Domain List</h2>
+
+Domain Verification:
+<br/>
+<label>Subdomain</label><input class="verify-redirect-input" type="text" value="verify_redirect" style="width: 250px;" readonly/>
+<br/>
+<label>TXT Record</label><input class="verify-redirect-input" type="text" value="{domainVerify}" style="width: 800px;" readonly/>
+<br/>
+<br/>
+
+CNAME Record <input class="verify-redirect-input" type="text" value="{domainCNAME}" style="width: 250px;" readonly/>
+
+<br/>
+<br/>
+<hr/>
+<br/>
+
+<input id="add-new-domain" type="button" value="Add New Domain"/>
+<input id="save-domain-list" type="button" value="Save Changes"/>
+
+<!-- <br/> -->
+<p id="error-msg"></p>
+<!-- <br/> -->
+
+<div id="domain-list">
+  {domains}
+</div>

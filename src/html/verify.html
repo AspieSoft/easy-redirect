@@ -1,0 +1,9 @@
+<h2>Verify Email</h2>
+
+<h3>An authentication code has been sent to your email</h3>
+<form action="/" method="POST">
+  <input type="hidden" name="email" value="{email}"/>
+  <label for="auth-code">Auth Code</label><input type="text" id="auth-code" name="auth-code" value="{DebugAuthCode}"/>
+  <br/>
+  <input type="submit" value="Login"/>
+</form>
