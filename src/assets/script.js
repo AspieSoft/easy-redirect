@@ -53,12 +53,17 @@ document.addEventListener('DOMContentLoaded', function(){
         errorMsg.textContent = '';
       }
 
+      const randID = `checkbox_`+Math.floor(Math.random() * Math.pow(10, 8)).toString();
+      console.log(randID)
+
       const newCont = document.createElement('div');
       newCont.classList.add('container');
       newCont.innerHTML = `
       Subdomain:<input type="text" name="subdomain" value="" placeholder="subdomain"/>${domain}
       <br/>
       Redirect:<input type="text" name="redirect" value="" placeholder="redirect"/>
+      <br/>
+      <input type="checkbox" id="${randID}" name="permanent"/><label for="${randID}" class="checkbox">Permanent</label>
       <br/>
       <input type="button" name="remove" value="Remove">
       `;
@@ -94,11 +99,13 @@ document.addEventListener('DOMContentLoaded', function(){
       redirectList.querySelectorAll('.container').forEach(function(elm){
         let subdomain = elm.querySelector('input[name="subdomain"]');
         let uri = elm.querySelector('input[name="redirect"]');
+        let perm = elm.querySelector('input[name="permanent"]');
 
         if(subdomain && uri && subdomain.value !== '' && uri.value !== ''){
           list.push({
             subdomain: subdomain.value,
             uri: uri.value,
+            status: perm.checked ? 301 : 302,
           });
         }
       });

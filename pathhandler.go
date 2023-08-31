@@ -317,6 +317,13 @@ func handlePath(){
 				if val, ok := red["uri"]; ok {
 					uri = goutil.Conv.ToBytes(val)
 				}
+				if val, ok := red["status"]; ok {
+					status := goutil.Conv.ToBytes(val)
+					if bytes.Equal(status, []byte("301")) || bytes.Equal(status, []byte("302")) {
+						uri = append(uri, '\n')
+						uri = append(uri, goutil.Conv.ToBytes(val)...)
+					}
+				}
 
 				if sub != "" && len(uri) != 0 {
 					delete(fileList, sub)
@@ -385,13 +392,26 @@ func handleUrl(w http.ResponseWriter, r *http.Request, url string) bool {
 				if err != nil {
 					continue
 				}
+				uriData := bytes.SplitN(uri, []byte{'\n'}, 2)
+				if len(uriData) == 0 {
+					continue
+				}
+
+				perm := ``
+				if len(uriData) > 1 && bytes.Equal(uriData[1], []byte("301")) {
+					perm = ` checked`
+				}
+
+				randCheckID := `checkbox_`+string(goutil.Crypt.RandBytes(8, []byte("-_")))
 
 				redirectList = append(redirectList, regex.JoinBytes(
 					`<div class="container">`,
 					`Subdomain:<input type="text" name="subdomain" value="`, fileName, `" placeholder="subdomain"/>`,
 					`.`, domain,
 					`<br/>`,
-					`Redirect:<input type="text" name="redirect" value="`, uri, `" placeholder="redirect"/>`,
+					`Redirect:<input type="text" name="redirect" value="`, uriData[0], `" placeholder="redirect"/>`,
+					`<br/>`,
+					`<input type="checkbox" id="`, randCheckID, `" name="permanent"`, perm, `/><label for="`, randCheckID, `" class="checkbox">Permanent</label>`,
 					`<br/>`,
 					`<input type="button" name="remove" value="Remove">`,
 					`</div>`,
@@ -560,13 +580,24 @@ func handleDomainRedirect(w http.ResponseWriter, r *http.Request, domain string)
 				uri = append([]byte("https://"+domain), uri...)
 			}
 
-			// prevent self redirects
-			if !regex.Comp(`https?://`).Match(uri) || regex.Comp(`^(https?://|)%1`, serverDomain).Match(uri) || regex.Comp(`^(https?://|)(%1|)%2`, goutil.Clean.Str(r.Host), goutil.Clean.Str(r.RequestURI)).Match(uri) {
+			uriData := bytes.SplitN(uri, []byte{'\n'}, 2)
+			if len(uriData) == 0 {
 				resErr(w, r, 400, "Bad Request")
 				return
 			}
 
-			http.Redirect(w, r, string(uri), 302)
+			// prevent self redirects
+			if !regex.Comp(`https?://`).Match(uriData[0]) || regex.Comp(`^(https?://|)%1`, serverDomain).Match(uriData[0]) || regex.Comp(`^(https?://|)(%1|)%2`, goutil.Clean.Str(r.Host), goutil.Clean.Str(r.RequestURI)).Match(uriData[0]) {
+				resErr(w, r, 400, "Bad Request")
+				return
+			}
+
+			status := 302
+			if len(uriData) > 1 && bytes.Equal(uriData[1], []byte("301")) {
+				status = 301
+			}
+
+			http.Redirect(w, r, string(uriData[0]), status)
 			return
 		}
 	}
