@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function(){
       <br/>
       Redirect:<input type="text" name="redirect" value="" placeholder="redirect"/>
       <br/>
-      <input type="checkbox" id="${randID}" name="permanent"/><label for="${randID}" class="checkbox">Permanent</label>
+      <input type="checkbox" id="${randID}" name="permanent"/><label for="${randID}" class="checkbox">Permanent (301)</label>
       <br/>
       <input type="button" name="remove" value="Remove">
       `;
