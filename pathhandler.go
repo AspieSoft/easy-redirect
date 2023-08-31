@@ -521,7 +521,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) string {
 
 	file = regex.Comp(`\{email\}`).RepStr(file, []byte(email))
 
-	code := string(goutil.Crypt.RandBytes(12))
+	code := string(goutil.Crypt.RandBytes(12, []byte("-_")))
 	authTokens.Set(pcID, authToken{
 		email: email,
 		token: code,
