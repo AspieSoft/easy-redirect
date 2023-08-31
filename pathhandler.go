@@ -411,7 +411,7 @@ func handleUrl(w http.ResponseWriter, r *http.Request, url string) bool {
 					`<br/>`,
 					`Redirect:<input type="text" name="redirect" value="`, uriData[0], `" placeholder="redirect"/>`,
 					`<br/>`,
-					`<input type="checkbox" id="`, randCheckID, `" name="permanent"`, perm, `/><label for="`, randCheckID, `" class="checkbox">Permanent</label>`,
+					`<input type="checkbox" id="`, randCheckID, `" name="permanent"`, perm, `/><label for="`, randCheckID, `" class="checkbox">Permanent (301)</label>`,
 					`<br/>`,
 					`<input type="button" name="remove" value="Remove">`,
 					`</div>`,
