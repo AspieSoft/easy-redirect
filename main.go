@@ -16,7 +16,9 @@ import (
 	"time"
 
 	"github.com/AspieSoft/go-regex-re2"
-	"github.com/AspieSoft/goutil/v5"
+	"github.com/AspieSoft/goutil/crypt"
+	"github.com/AspieSoft/goutil/fs"
+	"github.com/AspieSoft/goutil/v7"
 )
 
 var serverDomain string
@@ -43,7 +45,7 @@ var validExtList []string = []string{
 	"weba",
 }
 
-var tokenHashKey []byte = goutil.Crypt.RandBytes(64)
+var tokenHashKey []byte = crypt.RandBytes(64)
 
 var outDir string
 
@@ -147,7 +149,7 @@ func main(){
 				}
 			}
 
-			dbUserRoot, err := goutil.FS.JoinPath(dbRoot, userEmail)
+			dbUserRoot, err := fs.JoinPath(dbRoot, userEmail)
 			if err != nil {
 				resErr(w, r, 500, "Internal Server Error")
 				return
@@ -203,7 +205,7 @@ func main(){
 
 			for _, ext := range validExtList {
 				if strings.HasSuffix(url, "."+ext) {
-					if filePath, err := goutil.FS.JoinPath(outDir, cUrl+"."+ext); err == nil {
+					if filePath, err := fs.JoinPath(outDir, cUrl+"."+ext); err == nil {
 						if stat, err := os.Stat(filePath); err == nil && !stat.IsDir() {
 							http.ServeFile(w, r, filePath)
 							return
@@ -215,7 +217,7 @@ func main(){
 				}
 			}
 
-			if filePath, err := goutil.FS.JoinPath(outDir, cUrl[2:]+".html"); err == nil {
+			if filePath, err := fs.JoinPath(outDir, cUrl[2:]+".html"); err == nil {
 				if stat, err := os.Stat(filePath); err == nil && !stat.IsDir() {
 					http.ServeFile(w, r, filePath)
 					return
@@ -223,7 +225,7 @@ func main(){
 			}
 
 			for _, ext := range validExtList {
-				if filePath, err := goutil.FS.JoinPath(outDir, cUrl+"."+ext); err == nil {
+				if filePath, err := fs.JoinPath(outDir, cUrl+"."+ext); err == nil {
 					if stat, err := os.Stat(filePath); err == nil && !stat.IsDir() {
 						http.ServeFile(w, r, filePath)
 						return
@@ -297,7 +299,7 @@ func firewall(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func res(w http.ResponseWriter, r *http.Request, path string){
-	fullPath, err := goutil.FS.JoinPath(outDir, path+"/index.html")
+	fullPath, err := fs.JoinPath(outDir, path+"/index.html")
 	if err != nil {
 		resErr(w, r, 404, "Page Not Found")
 		return
@@ -309,7 +311,7 @@ func res(w http.ResponseWriter, r *http.Request, path string){
 		return
 	}
 
-	fullPath, err = goutil.FS.JoinPath(outDir, path+".html")
+	fullPath, err = fs.JoinPath(outDir, path+".html")
 	if err != nil {
 		resErr(w, r, 404, "Page Not Found")
 		return
@@ -325,7 +327,7 @@ func res(w http.ResponseWriter, r *http.Request, path string){
 }
 
 func getFile(path string) []byte {
-	fullPath, err := goutil.FS.JoinPath(outDir, path+"/index.html")
+	fullPath, err := fs.JoinPath(outDir, path+"/index.html")
 	if err != nil {
 		return nil
 	}
@@ -334,7 +336,7 @@ func getFile(path string) []byte {
 		return file
 	}
 
-	fullPath, err = goutil.FS.JoinPath(outDir, path+".html")
+	fullPath, err = fs.JoinPath(outDir, path+".html")
 	if err != nil {
 		return nil
 	}
@@ -363,17 +365,17 @@ func resErr(w http.ResponseWriter, r *http.Request, status int, msg string){
 func getPCID(r *http.Request) string {
 	res := [][]byte{}
 
-	if hash, err := goutil.Crypt.Hash.New([]byte(goutil.Clean.Str(r.Host)), tokenHashKey); err == nil {
+	if hash, err := crypt.Hash.New([]byte(goutil.Clean.Str(r.Host)), tokenHashKey); err == nil {
 		res = append(res, hash)
 	}
 
-	if hash, err := goutil.Crypt.Hash.New([]byte(goutil.Clean.Str(r.Proto)), tokenHashKey); err == nil {
+	if hash, err := crypt.Hash.New([]byte(goutil.Clean.Str(r.Proto)), tokenHashKey); err == nil {
 		res = append(res, hash)
 	}
 
 	res = append(res, []byte(getHashedIP(r)))
 
-	if hash, err := goutil.Crypt.Hash.New([]byte(goutil.Clean.Str(r.UserAgent())), tokenHashKey); err == nil {
+	if hash, err := crypt.Hash.New([]byte(goutil.Clean.Str(r.UserAgent())), tokenHashKey); err == nil {
 		res = append(res, hash)
 	}
 
@@ -384,17 +386,17 @@ func getHashedIP(r *http.Request) string {
 	res := [][]byte{}
 
 	if ip := []byte(goutil.Clean.Str(r.Header.Get("X-Real-IP"))); len(ip) != 0 && !regex.Comp(`localhost|127.0.0.1|::1`).Match(ip) {
-		if hash, err := goutil.Crypt.Hash.New(ip, tokenHashKey); err == nil {
+		if hash, err := crypt.Hash.New(ip, tokenHashKey); err == nil {
 			res = append(res, hash)
 		}
 	}else if ip := []byte(goutil.Clean.Str(r.Header.Get("X-Forwarded-For"))); len(ip) != 0 && !regex.Comp(`localhost|127.0.0.1|::1`).Match(ip) {
-		if hash, err := goutil.Crypt.Hash.New(ip, tokenHashKey); err == nil {
+		if hash, err := crypt.Hash.New(ip, tokenHashKey); err == nil {
 			res = append(res, hash)
 		}
 	}
 
 	if ip := []byte(goutil.Clean.Str(r.RemoteAddr)); len(ip) != 0 && !regex.Comp(`localhost|127.0.0.1|::1`).Match(ip) {
-		if hash, err := goutil.Crypt.Hash.New(ip, tokenHashKey); err == nil {
+		if hash, err := crypt.Hash.New(ip, tokenHashKey); err == nil {
 			res = append(res, hash)
 		}
 	}

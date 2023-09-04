@@ -12,7 +12,9 @@ import (
 
 	"github.com/AspieSoft/go-regex-re2"
 	"github.com/AspieSoft/gomail"
-	"github.com/AspieSoft/goutil/v5"
+	"github.com/AspieSoft/goutil/crypt"
+	"github.com/AspieSoft/goutil/fs"
+	"github.com/AspieSoft/goutil/v7"
 	"github.com/alphadose/haxmap"
 )
 
@@ -161,7 +163,7 @@ func handlePath(){
 			return
 		}
 
-		dbUserRoot, err := goutil.FS.JoinPath(dbRoot, userEmail)
+		dbUserRoot, err := fs.JoinPath(dbRoot, userEmail)
 		if err != nil {
 			w.WriteHeader(400)
 			w.Header().Set("content-type", "application/json")
@@ -188,7 +190,7 @@ func handlePath(){
 			domain := string(regex.Comp(`[^\w_\-\.]`).RepStr(goutil.Conv.ToBytes(val), []byte{}))
 			if domain != "" {
 				delete(fileList, domain)
-				if path, err := goutil.FS.JoinPath(dbUserRoot, domain); err == nil {
+				if path, err := fs.JoinPath(dbUserRoot, domain); err == nil {
 					// verify domain ownership
 					valid := false
 					if txtList, err := net.LookupTXT("verify_redirect."+domain); err == nil {
@@ -212,7 +214,7 @@ func handlePath(){
 		// remove old uri files
 		for name, val := range fileList {
 			if val && name != "" && name != "." && name != ".." {
-				if path, err := goutil.FS.JoinPath(dbUserRoot, name); err == nil {
+				if path, err := fs.JoinPath(dbUserRoot, name); err == nil {
 					os.RemoveAll(path)
 				}
 			}
@@ -286,7 +288,7 @@ func handlePath(){
 			return
 		}
 
-		dbDomainRoot, err := goutil.FS.JoinPath(dbRoot, userEmail, domain)
+		dbDomainRoot, err := fs.JoinPath(dbRoot, userEmail, domain)
 		if err != nil {
 			w.WriteHeader(400)
 			w.Header().Set("content-type", "application/json")
@@ -330,9 +332,9 @@ func handlePath(){
 
 					// verify domain ownership
 					if txt, err := os.ReadFile(dbDomainRoot+"/domain.key"); err == nil && string(txt) == domainVerify {
-						if path, err := goutil.FS.JoinPath(dbDomainRoot, sub); err == nil {
+						if path, err := fs.JoinPath(dbDomainRoot, sub); err == nil {
 							os.WriteFile(path, uri, 0644)
-							if rPath, err := goutil.FS.JoinPath(dbRedirectsRoot, string(regex.Comp(`\.[\w_\-]+$`).RepStr([]byte(sub), []byte{'.'}))+domain); err == nil {
+							if rPath, err := fs.JoinPath(dbRedirectsRoot, string(regex.Comp(`\.[\w_\-]+$`).RepStr([]byte(sub), []byte{'.'}))+domain); err == nil {
 								os.Link(path, rPath)
 							}
 						}
@@ -344,11 +346,11 @@ func handlePath(){
 		// remove old uri files
 		for name, val := range fileList {
 			if val && name != "" && name != "." && name != ".." {
-				if path, err := goutil.FS.JoinPath(dbDomainRoot, name); err == nil {
+				if path, err := fs.JoinPath(dbDomainRoot, name); err == nil {
 					// verify domain ownership
 					if txt, err := os.ReadFile(dbDomainRoot+"/domain.key"); err == nil && string(txt) == domainVerify {
 						os.Remove(path)
-						if rPath, err := goutil.FS.JoinPath(dbRedirectsRoot, string(regex.Comp(`\.[\w_\-]+$`).RepStr([]byte(name), []byte{'.'}))+domain); err == nil {
+						if rPath, err := fs.JoinPath(dbRedirectsRoot, string(regex.Comp(`\.[\w_\-]+$`).RepStr([]byte(name), []byte{'.'}))+domain); err == nil {
 							os.Remove(rPath)
 						}
 					}
@@ -367,7 +369,7 @@ func handleUrl(w http.ResponseWriter, r *http.Request, url string) bool {
 
 	domain := regex.Comp(`[^\w_\-\.]`).RepStr([]byte(url), []byte{})
 
-	dbDomainRoot, err := goutil.FS.JoinPath(dbRoot, userEmail, string(domain))
+	dbDomainRoot, err := fs.JoinPath(dbRoot, userEmail, string(domain))
 	if err != nil {
 		return false
 	}
@@ -387,7 +389,7 @@ func handleUrl(w http.ResponseWriter, r *http.Request, url string) bool {
 		for _, file := range files {
 			fileName := regex.Comp(`([^\w_\-\.]|\.[\w_\-]+$)`).RepStr([]byte(file.Name()), []byte{})
 
-			if path, err := goutil.FS.JoinPath(dbDomainRoot, string(fileName)+".url"); err == nil {
+			if path, err := fs.JoinPath(dbDomainRoot, string(fileName)+".url"); err == nil {
 				uri, err := os.ReadFile(path)
 				if err != nil {
 					continue
@@ -402,7 +404,7 @@ func handleUrl(w http.ResponseWriter, r *http.Request, url string) bool {
 					perm = ` checked`
 				}
 
-				randCheckID := `checkbox_`+string(goutil.Crypt.RandBytes(8, []byte("-_")))
+				randCheckID := `checkbox_`+string(crypt.RandBytes(8, []byte("-_")))
 
 				redirectList = append(redirectList, regex.JoinBytes(
 					`<div class="container">`,
@@ -490,7 +492,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) string {
 			return ""
 		}
 
-		token := string(goutil.Crypt.RandBytes(256))
+		token := string(crypt.RandBytes(256))
 		exp := time.Now().Add(24 * time.Hour)
 
 		authTokens.Set(pcID, authToken{
@@ -521,7 +523,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) string {
 
 	file = regex.Comp(`\{email\}`).RepStr(file, []byte(email))
 
-	code := string(goutil.Crypt.RandBytes(12, []byte("-_")))
+	code := string(crypt.RandBytes(12, []byte("-_")))
 	authTokens.Set(pcID, authToken{
 		email: email,
 		token: code,
@@ -574,7 +576,7 @@ func verifyAPI(w http.ResponseWriter, r *http.Request) string {
 }
 
 func handleDomainRedirect(w http.ResponseWriter, r *http.Request, domain string){
-	if path, err := goutil.FS.JoinPath(dbRedirectsRoot, domain); err == nil {
+	if path, err := fs.JoinPath(dbRedirectsRoot, domain); err == nil {
 		if uri, err := os.ReadFile(path); err == nil && len(uri) != 0 {
 			if bytes.HasPrefix(uri, []byte("/")) {
 				uri = append([]byte("https://"+domain), uri...)

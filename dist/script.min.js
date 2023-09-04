@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function(){
       if(data.failList && Array.isArray(data.failList)){
         failList = data.failList;
       }
-      
+
       if(elm.value === ''){
         elm.parentNode.remove();
         return;
